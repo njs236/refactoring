@@ -1,0 +1,8 @@
+1. Test code
+2. Identify bad smells, the ones with highest priority
+3. Version Control -
+4. Eliminate bad smell
+5. Test afterwards
+6.  Determine if need more refactoring
+
+7. Look for other bad smells
