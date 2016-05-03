@@ -3,9 +3,7 @@ import AbstractView as IView
 
 class View(IView):
 
-    def __init__(self, message=None):
-        if message is not None:
-            print(message)
+
 
     def show(self, message):
         print(message)

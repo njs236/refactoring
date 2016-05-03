@@ -1,3 +1,5 @@
+from Program import *
+
 class StringEnum(object):
 
     def __init__(self):

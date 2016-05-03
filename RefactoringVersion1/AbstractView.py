@@ -4,6 +4,10 @@ from abc import abstractmethod
 
 class AbstractView(metaclass=abc.ABCMeta):
 
+    def __init__(self, message=None):
+        if message is not None:
+            print(message)
+
     @abstractmethod
     def show(self):
         pass

@@ -1,3 +1,6 @@
+from StringEnum import *
+from Program import *
+
 class Record(object):
 
     _enumBMI = StringEnum()

@@ -1,3 +1,9 @@
+from Exceptions import *
+from Record import *
+from Program import *
+
+
+
 class RecordCollection(object):
 
     _letters = []

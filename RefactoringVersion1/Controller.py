@@ -1,6 +1,10 @@
 from Exceptions import *
 from RecordCollection import *
 from TestView import *
+from Option import *
+from Program import *
+from AbstractView import *
+import cmd
 
 class Controller(cmd.Cmd):
 
