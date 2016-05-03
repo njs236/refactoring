@@ -1,0 +1,23 @@
+Name: Large Class
+Location: <Scenario>-<0316_ERP_.py>-<Controller>-<between Line 403 and 801>
+Reasons:
+1. There are 29 methods in this class.
+2. Two responsibilities, in inputting data and then running methods on them.
+…
+Strategy/ approach: <Extract Class, Extract Subclass>
+
+Name:  Long Method
+Location: Scenario-<0316_ERP_.py>-<Controller>-<between Line 518 and 554>
+Reasons:
+1. Made up of longer than 10 lines
+2. Makes it hard to work out what the method does.
+…
+Strategy/ approach: <Extract Method, Replace Temp With Query, Replace Method with Method Object>
+
+Name: Inappropriate Intimacy
+Location: <Scenario>-<0316_ERP_.py>-<Controller>-<between Line 483 and 493> (numerous times)
+Reasons:
+1. The class interferes with the set and get methods of the Record class.
+2. It handles all the collection of Records without the RecordCollection doing anything.
+…
+Strategy/ approach: <Move Method, Move Field>

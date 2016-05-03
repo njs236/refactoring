@@ -1,0 +1,32 @@
+I will set up a sub class of the Command.cmd module called "Command"
+this will handle the inputs and pass info to the controller.
+I will take all the methods out of the controller class related to Command.Cmd module and make them available to the Command class
+
+This change will see the following methods moved to a class called Command.
+
+do_view_records(self, arg)
+do_view_options(self, arg)
+do_graphic_gender_pie_chart(self, arg)
+do_graphic_age_bar_chart(self, arg)
+do_select_rec(self, arg)
+do_select_option(self, arg)
+do_text_load(self, arg)
+do_text_save(self, arg)
+do_serial_load(self, arg)
+do_serial_save(self, arg)
+do_add_rec(self, arg)
+do_edit_age(self, arg)
+do_edit_sales(self, arg)
+do_edit_bmi(self, arg)
+do_edit_income(self, arg)
+do_on(self, arg)
+do_off(self, arg)
+do_neutral(self, arg)
+do_exit(self, arg)
+do_help(self, arg)
+
+This is because do_ commands are part of the Command.Cmd module
+
+i will also make a method in the Command class called "Show", since Command.Cmd provides methods for input.
+
+
