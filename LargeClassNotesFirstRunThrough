@@ -1,9 +1,0 @@
-This is in keeping with the step in the code, to look at the next stage.
-
-There are lots of references to controller within the command class, which are there only to make the program stop from breaking.
-
-This means that I have just introduced complexity to the program by making a class that almost exclusively relies on another class for its implementation.
-
-I will set up functions in the controller where applicable to reduce the dependency on the controller class.
-
-However, the problem is solved. the controller class now only has 6 methods which interface with view in regard to displaying it to the user. 

@@ -67,4 +67,9 @@ class TestStatementCoverage(unittest.TestCase):
 
         self.assertEqual(actual, expected, "passed enter neutral state test")
 
+    def test_dographicagechart(self):
+        actual = self.myController._printAgeData(0,100,10)
+
+        self.assertEqual(actual, True)
+
 

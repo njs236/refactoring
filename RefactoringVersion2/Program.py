@@ -257,6 +257,25 @@ class RecordCollection(object):
                 i = int((high + low) / 2)
             return (None, i)  # (no match, index for prospect ID)
 
+    def _getAgeData(self, start, end, interval):
+        limits = []
+        ageCount = []
+        for i in range(start, end, interval):
+            limits.append(i)
+            ageCount.append(0)
+        allRecords = self.getAllRecords()
+        for r in allRecords:
+            a = r.getAge()
+            lastLimit = None
+            k = 0
+            while k < len(limits) and limits[k] < a:
+                lastLimit = k
+                k += 1
+            if lastLimit is not None:
+                ageCount[lastLimit] += 1
+
+        return (limits, ageCount)
+
     def _autoID(self):
         theLength = len(self._allMyRecords)
         if 26000 <= theLength:
@@ -477,6 +496,12 @@ your acknowledgement) in some activities", "ERP view flows naturally")
         self._selectedOption = None
         self._myView.show("EMPLOYEE RECORD PROGRAM - ")
 
+    def _printAgeData(self, start, end, interval):
+        limits, ageCount = self._theColl._getAgeData(start, end, interval)
+        self._myView.barChart(limits, ageCount)
+        return True
+
+
     def _add(self, data):
         recArgs = data.split(" ")
         if 6 <= len(recArgs):
@@ -626,22 +651,7 @@ class Command(cmd.Cmd):
             end = safeInt(spec[1], end)
         if 0 < len(spec):
             start = safeInt(spec[0], start)
-        limits = []
-        ageCount = []
-        for i in range(start, end, interval):
-            limits.append(i)
-            ageCount.append(0)
-        allRecords = self._myController._theColl.getAllRecords()
-        for r in allRecords:
-            a = r.getAge()
-            lastLimit = None
-            k = 0
-            while k < len(limits) and limits[k] < a:
-                lastLimit = k
-                k += 1
-            if lastLimit is not None:
-                ageCount[lastLimit] += 1
-        self._myController._myView.barChart(limits, ageCount)
+        self._myController._printAgeData(start, end, interval)
 
     def do_select_rec(self, arg):
         """
