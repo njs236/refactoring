@@ -379,6 +379,11 @@ class ViewException(CustomException):
     def __init__(self, theReason="Not a View"):
         super(ViewException, self).__init__(theReason)
 
+class ControllerException(CustomException):
+
+    def __init__(self, theReason="Not a Controller"):
+        super(ControllerException, self).__init__(theReason)
+
 
 class InsufficientArgumentsException(CustomException):
 
@@ -444,7 +449,7 @@ class View(IView):
             viewPlot.show()
 
 
-class Controller(cmd.Cmd):
+class Controller():
 
     def __init__(self, newView, newRecordColl=None):
         super(Controller, self).__init__()
@@ -533,17 +538,47 @@ to edit the record:\n+ edit_age\n+ edit_sales\n+ edit_bmi\n+ edit_income\n")
         self._selectedOption = None
         return True
 
+
+# ARGUMENT METHODS
+
+def serialLoad(arg):
+    report = ""
+    import pickle
+    x = None
+    try:
+        with open(arg, 'rb') as f:
+            x = pickle.load(f)
+    except IOError as e:
+        report = "Failed to do serial load: {}\n".format(str(e))
+    except AttributeError as e:
+        report += "Failed to do serial load: {}\n".format(str(e))
+    if isinstance(x, RecordCollection):
+        report += "Serial load of record collection successful\n"
+        return (x, report)
+    else:
+        return (None, report)
+
+# ADDITIONS
+
+class Command(cmd.Cmd):
+    def __init__(self, theController):
+        super(Command, self).__init__()
+        if not isinstance( theController, Controller):
+            raise ControllerException
+        self._myController = theController
+
+
     def do_view_records(self, arg):
         """
         View all the records
         """
-        allRecords = self._theColl.getAllRecords()
+        allRecords = self._myController._theColl.getAllRecords()
         result = ""
         for r in allRecords:
             result += "{} {} {} {} {} {}\n".format(r.getID(), r.getGender(),
                                                    r.getAge(), r.getSales(),
                                                    r.getBMI(), r.getIncome())
-        self._myView.show(result)
+        self._myController._myView.show(result)
 
     def do_view_options(self, arg):
         """
@@ -551,8 +586,8 @@ to edit the record:\n+ edit_age\n+ edit_sales\n+ edit_bmi\n+ edit_income\n")
         """
         result = ""
         for code in self._options:
-            self._myView.show("Option Code: {}".format(code))
-            self._representOption(self._options[code])
+            self._myController._myView.show("Option Code: {}".format(code))
+            self._myController._representOption(self._options[code])
 
     def do_graphic_gender_pie_chart(self, arg):
         """
@@ -560,13 +595,13 @@ to edit the record:\n+ edit_age\n+ edit_sales\n+ edit_bmi\n+ edit_income\n")
         """
         mCount = 0
         fCount = 0
-        allRecords = self._theColl.getAllRecords()
+        allRecords = self._myController._theColl.getAllRecords()
         for r in allRecords:
             if r.getGender() == "M":
                 mCount += 1
             elif r.getGender() == "F":
                 fCount += 1
-        self._myView.pieChart([("Males", mCount), ("Females", fCount)])
+        self._myController._myView.pieChart([("Males", mCount), ("Females", fCount)])
 
     def do_graphic_age_bar_chart(self, arg):
         """
@@ -594,7 +629,7 @@ to edit the record:\n+ edit_age\n+ edit_sales\n+ edit_bmi\n+ edit_income\n")
         for i in range(start, end, interval):
             limits.append(i)
             ageCount.append(0)
-        allRecords = self._theColl.getAllRecords()
+        allRecords = self._myController._theColl.getAllRecords()
         for r in allRecords:
             a = r.getAge()
             lastLimit = None
@@ -604,7 +639,7 @@ to edit the record:\n+ edit_age\n+ edit_sales\n+ edit_bmi\n+ edit_income\n")
                 k += 1
             if lastLimit is not None:
                 ageCount[lastLimit] += 1
-        self._myView.barChart(limits, ageCount)
+        self._myController._myView.barChart(limits, ageCount)
 
     def do_select_rec(self, arg):
         """
@@ -612,13 +647,13 @@ to edit the record:\n+ edit_age\n+ edit_sales\n+ edit_bmi\n+ edit_income\n")
         arg: The ID of the existing record
 
         """
-        trial = self._theColl.getRecord(arg)
+        trial = self._myController._theColl.getRecord(arg)
         if trial is not None:
-            self._selectedRecord = trial
-            self._enterRecordSelectedState()
+            self._myController._selectedRecord = trial
+            self._myController._enterRecordSelectedState()
         else:
-            self._myView.show("There is no record with that ID\n")
-            self._enterNeutralState()
+            self._myController._myView.show("There is no record with that ID\n")
+            self._myController._enterNeutralState()
 
     def do_select_option(self, arg):
         """
@@ -627,12 +662,12 @@ to edit the record:\n+ edit_age\n+ edit_sales\n+ edit_bmi\n+ edit_income\n")
         For option codes, please command view_options
         """
         trial = arg.upper()
-        if trial in self._options:
-            self._selectedOption = self._options[trial]
-            self._enterOptionSelectedState()
+        if trial in self._myController._options:
+            self._myController._selectedOption = self._myController._options[trial]
+            self._myController._enterOptionSelectedState()
         else:
-            self._myView.show("There is no option\n")
-            self._enterNeutralState()
+            self._myController._myView.show("There is no option\n")
+            self._myController._enterNeutralState()
 
     def do_text_load(self, arg):
         """
@@ -640,7 +675,7 @@ to edit the record:\n+ edit_age\n+ edit_sales\n+ edit_bmi\n+ edit_income\n")
         ERP will attempt to append all records to the collection
         arg: The loaction of the text file
         """
-        self._enterNeutralState()
+        self._myController._enterNeutralState()
         try:
             theFile = open(arg, 'r')
             theLines = theFile.readlines()
@@ -654,17 +689,17 @@ to edit the record:\n+ edit_age\n+ edit_sales\n+ edit_bmi\n+ edit_income\n")
                 else:
                     data = theLines[i]
                 try:
-                    self._add(data)
+                    self._myController._add(data)
                 except CustomException as e:
                     report += "BAD LINE {}: {}\n".format(i + 1, str(e))
                 else:
                     added += 1
         except IOError as e:
-            self._myView.show("EXCEPTION: {}\n".format(str(e)))
+            self._myController._myView.show("EXCEPTION: {}\n".format(str(e)))
         else:
-            self._myView.show("Records Added: {}\nProblems: \n{}\n\
+            self._myController._myView.show("Records Added: {}\nProblems: \n{}\n\
 ".format(added, report))
-        self._stall()
+        self._myController._stall()
 
     def do_text_save(self, arg):
         """
@@ -677,7 +712,7 @@ to edit the record:\n+ edit_age\n+ edit_sales\n+ edit_bmi\n+ edit_income\n")
             try:
                 theFile = open(arg, 'w')
                 theLines = []
-                allRecords = self._theColl.getAllRecords()
+                allRecords = self._myController._theColl.getAllRecords()
                 total = len(allRecords)
                 for i in range(total):
                     r = allRecords[i]
@@ -693,20 +728,20 @@ to edit the record:\n+ edit_age\n+ edit_sales\n+ edit_bmi\n+ edit_income\n")
                 theFile.writelines(theLines)
                 theFile.close()
             except IOError as e:
-                self._myView.show("EXCEPTION: {}\n".format(str(e)))
+                self._myController._myView.show("EXCEPTION: {}\n".format(str(e)))
             else:
-                self._myView.show("Saved As Text")
-            self._stall()
+                self._myController._myView.show("Saved As Text")
+            self._myController._stall()
         else:
-            self._myView.show("Will not overwrite an existing file\n\
+            self._myController._myView.show("Will not overwrite an existing file\n\
 Please, enter a new file when using serial_save\n")
-        self._enterNeutralState()
+        self._myController._enterNeutralState()
 
     def do_serial_load(self, arg):
         """
         Instructions for loading a serial record collection as the ERP starts
         """
-        myView.show("++ APPLIES TO SERIAL COLLECTION, NOT TEXT ++\n\
+        self._myController._myView.show("++ APPLIES TO SERIAL COLLECTION, NOT TEXT ++\n\
 When starting ERP via the command line, enter the argument\
 \n    COLL:[file location]\nERP will then attempt to load the collection \
 from that\n")
@@ -723,13 +758,13 @@ from that\n")
         if not os.path.isfile(arg):  # protection from overwriting files
             try:
                 with open(arg, 'wb') as f:
-                    pickle.dump(self._theColl, f)
+                    pickle.dump(self._myController._theColl, f)
             except IOError as e:
-                self._myView.show("EXCEPTION: {}\n".format(str(e)))
+                self._myController._myView.show("EXCEPTION: {}\n".format(str(e)))
         else:
-            self._myView.show("Will not overwrite an existing file\n\
+            self._myController._myView.show("Will not overwrite an existing file\n\
 Please, enter a new file when using serial_save\n")
-        self._enterNeutralState()
+        self._myController._enterNeutralState()
 
     def do_add_rec(self, arg):
         """
@@ -742,14 +777,14 @@ Please, enter a new file when using serial_save\n")
         arg 5: BMI (Normal|Overweight|Obesity|Underweight)
         arg 6: Income [0-9]{2,3}
         """
-        self._enterNeutralState()
+        self._myController._enterNeutralState()
         try:
-            self._add(arg)
+            self._myController._add(arg)
         except CustomException as e:
-            self._myView.show("EXCEPTION: {}\n".format(str(e)))
+            self._myController._myView.show("EXCEPTION: {}\n".format(str(e)))
         else:
-            self._myView.show("Record added\n")
-        self._stall()
+            self._myController._myView.show("Record added\n")
+        self._myController._stall()
 
     def do_edit_age(self, arg):
         """
@@ -757,12 +792,12 @@ Please, enter a new file when using serial_save\n")
         Change the age of the record
         arg: [0-9]{2}
         """
-        if self._selectedRecord is not None:
-            self._selectedRecord.setAge(int(arg))
-            self._enterRecordSelectedState()
+        if self._myController._selectedRecord is not None:
+            self._myController._selectedRecord.setAge(int(arg))
+            self._myController._enterRecordSelectedState()
         else:
-            self._myView.show("No record selected")
-            self._enterNeutralState()
+            self._myController._myView.show("No record selected")
+            self._myController._enterNeutralState()
 
     def do_edit_sales(self, arg):
         """
@@ -770,12 +805,12 @@ Please, enter a new file when using serial_save\n")
         Change the sales of the record
         arg: [0-9]{3}
         """
-        if self._selectedRecord is not None:
-            self._selectedRecord.setSales(int(arg))
-            self._enterRecordSelectedState()
+        if self._myController._selectedRecord is not None:
+            self._myController._selectedRecord.setSales(int(arg))
+            self._myController._enterRecordSelectedState()
         else:
-            self._myView.show("No record selected")
-            self._enterNeutralState()
+            self._myController._myView.show("No record selected")
+            self._myController._enterNeutralState()
 
     def do_edit_bmi(self, arg):
         """
@@ -783,12 +818,12 @@ Please, enter a new file when using serial_save\n")
         Change the BMI of the record
         arg: (Normal|Overweight|Obesity|Underweight)
         """
-        if self._selectedRecord is not None:
-            self._selectedRecord.setBMI(arg)
-            self._enterRecordSelectedState()
+        if self._myController._selectedRecord is not None:
+            self._myController._selectedRecord.setBMI(arg)
+            self._myController._enterRecordSelectedState()
         else:
-            self._myView.show("No record selected")
-            self._enterNeutralState()
+            self._myController._myView.show("No record selected")
+            self._myController._enterNeutralState()
 
     def do_edit_income(self, arg):
         """
@@ -796,82 +831,62 @@ Please, enter a new file when using serial_save\n")
         Change the income of the record
         arg: [0-9]{3}
         """
-        if self._selectedRecord is not None:
-            self._selectedRecord.setIncome(int(arg))
-            self._enterRecordSelectedState()
+        if self._myController._selectedRecord is not None:
+            self._myController._selectedRecord.setIncome(int(arg))
+            self._myController._enterRecordSelectedState()
         else:
-            self._myView.show("No record selected")
-            self._enterNeutralState()
+            self._myController._myView.show("No record selected")
+            self._myController._enterNeutralState()
 
     def do_on(self, arg):
         """
         An option must be selected
         Turn the option on
         """
-        if self._selectedOption is not None:
-            self._selectedOption.turnOn()
-            self._enterOptionSelectedState()
+        if self._myController._selectedOption is not None:
+            self._myController._selectedOption.turnOn()
+            self._myController._enterOptionSelectedState()
         else:
-            self._myView.show("No option selected")
-            self._enterNeutralState()
+            self._myController._myView.show("No option selected")
+            self._myController._enterNeutralState()
 
     def do_off(self, arg):
         """
         An option must be selected
         Turn the option off
         """
-        if self._selectedOption is not None:
-            self._selectedOption.turnOff()
-            self._enterOptionSelectedState()
+        if self._myController._selectedOption is not None:
+            self._myController._selectedOption.turnOff()
+            self._myController._enterOptionSelectedState()
         else:
-            self._myView.show("No option selected")
-            self._enterNeutralState()
+            self._myController._myView.show("No option selected")
+            self._myController._enterNeutralState()
 
     def do_neutral(self, arg):
         """
         Put the control of ERP in a neutral state
         """
-        self._enterNeutralState()
-        self._representERP()
+        self._myController._enterNeutralState()
+        self._myController._representERP()
 
     def do_exit(self, arg):
         """
         If a record or an option is selected, ERP enters a neutral state
         Otherwise, ERP ends
         """
-        if (self._selectedRecord is not None or
-                self._selectedOption is not None):
-            self._enterNeutralState()
-            self._representERP()
+        if (self._myController._selectedRecord is not None or
+                self._myController._selectedOption is not None):
+            self._myController._enterNeutralState()
+            self._myController._representERP()
         else:
-            self._myView.show("END")
+            self._myController._myView.show("END")
             return True
 
     def do_help(self, arg):
         """
         Special help
         """
-        super(Controller, self).do_help(arg)
-
-
-# ARGUMENT METHODS
-
-def serialLoad(arg):
-    report = ""
-    import pickle
-    x = None
-    try:
-        with open(arg, 'rb') as f:
-            x = pickle.load(f)
-    except IOError as e:
-        report = "Failed to do serial load: {}\n".format(str(e))
-    except AttributeError as e:
-        report += "Failed to do serial load: {}\n".format(str(e))
-    if isinstance(x, RecordCollection):
-        report += "Serial load of record collection successful\n"
-        return (x, report)
-    else:
-        return (None, report)
+        super(Command, self).do_help(arg)
 
 
 if __name__ == "__main__":
@@ -880,4 +895,5 @@ if __name__ == "__main__":
     for a in sys.argv:
         if a.upper()[0:5] == "COLL:":
             existingColl, report = serialLoad(a[5:])
-    Controller(View(report), existingColl).cmdloop()
+    myController = Controller(View(report), existingColl)
+    Command(myController).cmdloop()

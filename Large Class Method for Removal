@@ -1,4 +1,4 @@
-I will set up a sub class of the Command.cmd module called "Command"
+I will set up a sub class of the cmd.Cmd module called "Command"
 this will handle the inputs and pass info to the controller.
 I will take all the methods out of the controller class related to Command.Cmd module and make them available to the Command class
 
@@ -26,7 +26,5 @@ do_exit(self, arg)
 do_help(self, arg)
 
 This is because do_ commands are part of the Command.Cmd module
-
-i will also make a method in the Command class called "Show", since Command.Cmd provides methods for input.
 
 
