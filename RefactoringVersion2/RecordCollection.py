@@ -1,4 +1,4 @@
-ERP = __import__("0316_ERP_")
+import Program as ERP
 import unittest
 
 class TestRecordCollectionClass(unittest.TestCase):

@@ -1,0 +1,22 @@
+The controller currently has access to all the classes inner workings in its functions, and when I added the Command class, references to the controller were added into the Command class, meaning that the
+problem was not removed.
+
+In my steps for removal for Inappropriate Intimacy I will use the Move Method, Move Field refactoring methods
+
+I will take the method in representRecord into RecordCollection since the collection of records is in the RecordCollection
+Do view records currently accesses the view through the controller. I will take the parts related to view and put in controller, and the parts to do with records and put them in the record collection
+Do view options currently acceses information in the controller. I will take the view portions of the function and put them in the controller.
+do graphic gender pie chart currently accesses information in the record collection. I will take the view portion sof the function and put them in controller, and access information using RecordCollection
+do select records currently accesses records in the RecordCollection class. I will put the functionality for accessing records in the RecordCollection class
+do select options currently accesses information from the Controller. I will put the functionality for this in the controller, and accessing view from a method in controller.
+do text load does not need to be changed, except for adding a show method in the command class.
+do text save has functionality from the Record collection i will put it in the Record Collection class.
+edit_ functions all have functionality that is handled through controller, so i will put this in controller for editing the selected record.
+on and off functionas all have functionality that is handled in controller, so i will put this i controller for editing the selected option.
+
+In the process of refactoring I will have:
+added show function to command class
+added displaying of data functions to the RecordCollection
+added methods to controller for accessing record information and posting to view
+removed references to the protected attributes within classes (such as, selectedOption, selectedRecord)
+removed references to protected classes such as Record or Record Collection. Controller is responsible for accessing these

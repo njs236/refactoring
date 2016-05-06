@@ -1,0 +1,7 @@
+Successfully removed references to other classes from Controller and Command class.
+Successfully put methods into appropriate classes. Added functions to RecordCollection, Record, and Controller class.
+Problems encountered:
+Deciding whether or not to put a reference to RecordCollection class in the serial_save function as it just dumps the whole class into pickle format.
+Conscious that controller now has a bunch of methods responsible for the recordcollection. Does RecordCollection have all the functionality or does controller rely on logic
+(meaning hard to replace with another class)?
+It has turned the situation into a big dependent set of modules that work with each other, but rely too much on each other.
