@@ -10,7 +10,7 @@ Name:  Long Method
 Location: Scenario-<0316_ERP_.py>-<Controller>-<between Line 518 and 554>
 Reasons:
 1. Made up of longer than 10 lines
-2. Makes it hard to work out what the method does.
+2. Two responsibilities, handling the collection of Records and displaying to graph.
 …
 Strategy/ approach: <Extract Method, Replace Temp With Query, Replace Method with Method Object>
 
