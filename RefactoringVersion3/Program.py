@@ -7,17 +7,20 @@ from abc import *
 
 theLog = []
 
+
 def ClearLog():
 
     global theLog
     theLog = []
 
+
 class IView(metaclass=ABCMeta):
     @abstractmethod
-    def show(self,message):
+    def show(self, message):
         pass
+
     @abstractmethod
-    def pieChart(self,*args):
+    def pieChart(self, *args):
         pass
 
     @abstractmethod
@@ -27,7 +30,6 @@ class IView(metaclass=ABCMeta):
     @abstractmethod
     def stall(self):
         pass
-
 
 
 class TestView(IView):
@@ -40,12 +42,11 @@ class TestView(IView):
     def pieChart(self, *args):
         pass
 
-    def barChart(self,*args):
+    def barChart(self, *args):
         pass
 
     def stall(self):
         pass
-
 
 
 class CustomException(Exception):
@@ -214,9 +215,9 @@ class Record(object):
         return self._income
 
     def getAllRecords(self):
-        return {'id' : self.getID(), 'gender' :self.getGender(),
-                'age' : self.getAge(), 'sales' : self.getSales(),
-                'bmi' : self.getBMI(), 'income' : self.getIncome()}
+        return {'id': self.getID(), 'gender': self.getGender(),
+                'age': self.getAge(), 'sales': self.getSales(),
+                'bmi': self.getBMI(), 'income': self.getIncome()}
 
 
 class RecordCollection(object):
@@ -230,9 +231,9 @@ class RecordCollection(object):
         self._allMyRecords = []
 
     def _representRecord(self, theRecord):
-        return {'id' : theRecord.getID(), 'gender' : theRecord.getGender(),
-                'age' : theRecord.getAge(),'sales': theRecord.getSales(),
-                'bmi' : theRecord.getBMI(),'income' : theRecord.getIncome()}
+        return {'id': theRecord.getID(), 'gender': theRecord.getGender(),
+                'age': theRecord.getAge(), 'sales': theRecord.getSales(),
+                'bmi': theRecord.getBMI(), 'income': theRecord.getIncome()}
 
     def _prepID(self, theID):
         typeCheckStringERR(theID)
@@ -384,14 +385,13 @@ class RecordCollection(object):
             return rec
         except InvalidIDException:
             return None
+
     def displayAllRecords(self):
         records = self.getAllRecords()
         result = []
         for r in records:
             result.append(r.getAllRecords())
         return result
-
-
 
     def getAllRecords(self):
         return self._allMyRecords
@@ -426,6 +426,7 @@ class ViewException(CustomException):
 
     def __init__(self, theReason="Not a View"):
         super(ViewException, self).__init__(theReason)
+
 
 class ControllerException(CustomException):
 
@@ -479,8 +480,7 @@ class View(IView):
         input("- Enter to continue -")
 
     def barChart(self, labels, values):
-
-        #viewPlot.bar(range(len(labels)), values)
+        # viewPlot.bar(range(len(labels)), values)
         viewPlot.bar(labels, values)
         viewPlot.show()
 
@@ -533,24 +533,29 @@ your acknowledgement) in some activities", "ERP view flows naturally")
     def _printGenderData(self):
         mCount, fCount = self._theColl._getGenderData()
         self._myView.pieChart([("Males", mCount), ("Females", fCount)])
+        return True
 
-    def _selectRecord(self, arg= 'None'):
+    def _selectRecord(self, arg='None'):
         trial = self._theColl.getRecord(arg)
         if trial is not None:
             self._selectedRecord = trial
             self._enterRecordSelectedState()
+            return True
         else:
             self._myView.show("There is no record with that ID\n")
             self._enterNeutralState()
+        return False
 
-    def _selectOption(self, arg= 'None'):
+    def _selectOption(self, arg='None'):
         trial = arg.upper()
         if trial in self._options:
             self._selectedOption = self._options[trial]
             self._enterOptionSelectedState()
+            return True
         else:
             self._myView.show("There is no option\n")
             self._enterNeutralState()
+        return False
 
     def _textSave(self):
         theLines = []
@@ -559,8 +564,8 @@ your acknowledgement) in some activities", "ERP view flows naturally")
         for i in range(total):
             r = allRecords[i]
             asStr = "{} {} {} {} {} {}".format(r['id'], r['gender'],
-                                                    r['age'], r['sales'],
-                                                    r['bmi'], r['income'])
+                                               r['age'], r['sales'],
+                                               r['bmi'], r['income'])
             if i < (total - 1):
                 asStr += "\n"
             theLines.append(asStr)
@@ -570,63 +575,78 @@ your acknowledgement) in some activities", "ERP view flows naturally")
         if self._selectedRecord is not None:
             self._selectedRecord.setAge(int(arg))
             self._enterRecordSelectedState()
+            return True
         else:
             self._myView.show("No record selected")
             self._enterNeutralState()
+        return False
 
     def _editSales(self, arg):
-         if self._selectedRecord is not None:
+        if self._selectedRecord is not None:
             self._selectedRecord.setSales(int(arg))
             self._enterRecordSelectedState()
-         else:
+            return True
+        else:
             self._myView.show("No record selected")
             self._enterNeutralState()
+        return False
 
     def _editBmi(self, arg):
         if self._selectedRecord is not None:
             self._selectedRecord.setBMI(arg)
             self._enterRecordSelectedState()
+            return True
         else:
             self._myView.show("No record selected")
             self._enterNeutralState()
+        return False
 
     def _editIncome(self, arg):
         if self._selectedRecord is not None:
             self._selectedRecord.setIncome(int(arg))
             self._enterRecordSelectedState()
+            return True
         else:
             self._myView.show("No record selected")
             self._enterNeutralState()
+        return False
+
     def _turnOn(self):
         if self._selectedOption is not None:
             self._selectedOption.turnOn()
             self._enterOptionSelectedState()
+            return True
         else:
             self._myView.show("No option selected")
             self._enterNeutralState()
+        return False
+
     def _turnOff(self):
         if self._selectedOption is not None:
             self._selectedOption.turnOff()
             self._enterOptionSelectedState()
+            return True
         else:
             self._myView.show("No option selected")
             self._enterNeutralState()
-
+        return False
 
     def _viewRecords(self):
         allMyRecords = self._theColl.displayAllRecords()
         result = ""
         for r in allMyRecords:
-             result += "{} {} {} {} {} {}\n".format(r['id'], r['gender'],
-                                                    r['age'], r['sales'],
-                                                    r['bmi'], r['income'])
+            result += "{} {} {} {} {} {}\n".format(r['id'], r['gender'],
+                                                   r['age'], r['sales'],
+                                                   r['bmi'], r['income'])
 
         self._myView.show(result)
+        return True
 
     def _viewOptions(self):
         for code in self._options:
             self._myView.show("Option Code: {}".format(code))
             self._representOption(self._options[code])
+        return True
 
     def _add(self, data):
         recArgs = data.split(" ")
@@ -648,9 +668,9 @@ your acknowledgement) in some activities", "ERP view flows naturally")
     def _representRecord(self, theRecord):
         recordDisplay = self._theColl._representRecord(theRecord)
         self._myView.show("ID: {}\nGENDER: {}\nAGE: {}\nSALES: {}\nBMI: {}\
-\nINCOME: {}\n".format(recordDisplay['id'],recordDisplay['gender'],
-                       recordDisplay['age'],recordDisplay['sales'],
-                       recordDisplay['bmi'],recordDisplay['income'],))
+\nINCOME: {}\n".format(recordDisplay['id'], recordDisplay['gender'],
+                       recordDisplay['age'], recordDisplay['sales'],
+                       recordDisplay['bmi'], recordDisplay['income'],))
         return True
 
     def _representOption(self, theOption):
@@ -712,10 +732,11 @@ def serialLoad(arg):
 
 # ADDITIONS
 
+
 class Command(cmd.Cmd):
     def __init__(self, theController):
         super(Command, self).__init__()
-        if not isinstance( theController, Controller):
+        if not isinstance(theController, Controller):
             raise ControllerException
         self._myController = theController
 
@@ -733,7 +754,6 @@ class Command(cmd.Cmd):
         View the options and their purpose
         """
         self._myController._viewOptions()
-
 
     def do_graphic_gender_pie_chart(self, arg):
         """
@@ -826,12 +846,12 @@ class Command(cmd.Cmd):
                 theFile.writelines(theLines)
                 theFile.close()
             except IOError as e:
-                self._myController._myView.show("EXCEPTION: {}\n".format(str(e)))
+                self.show("EXCEPTION: {}\n".format(str(e)))
             else:
-                self._myController._myView.show("Saved As Text")
+                self.show("Saved As Text")
             self._myController._stall()
         else:
-            self._myController._myView.show("Will not overwrite an existing file\n\
+            self.show("Will not overwrite an existing file\n\
 Please, enter a new file when using serial_save\n")
         self._myController._enterNeutralState()
 

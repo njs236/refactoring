@@ -1,6 +1,7 @@
 import Program as ERP
 import unittest
 
+
 class TestRecordCollectionClass(unittest.TestCase):
 
     def test_InvalidIDException(self):

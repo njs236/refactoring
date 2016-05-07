@@ -1,6 +1,7 @@
 import Program as ERP
 import unittest
 
+
 class TestRecordClass(unittest.TestCase):
 
     def test_InvalidGenderException(self):
@@ -119,4 +120,3 @@ class TestRecordClass(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-
